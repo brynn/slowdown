@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load static %}
+{% load custom_filters %} 
+{% load tz %}
+
+{% block head_scripts %}
+
+<style type=text/css>
+
+
+.settings {
+	background-color: #f9f9f9;
+	padding: 30px 30px 20px 30px;
+	margin: 20px 0;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+.settings p:not(:last-child) {
+	margin-bottom: 20px;
+}
+
+.editsettings, .logout {
+	float: left;
+}
+
+.editsettings {
+	margin-right: 10px;
+}
+
+.logout {
+	margin-top: 7px;
+}
+
+.profilepic {
+	width: 50px;
+	margin: 5px 5px 5px 0;
+}
+
+.faces {
+	width: 360px;
+	margin-top: -10px;
+}
+
+
+@media (max-width: 784px) { 
+	.settings {
+		background-color: #fff;
+		padding: 0;
+		margin: 0 0 30px 0;
+		-webkit-border-radius: none;
+		-moz-border-radius: none;
+		border-radius: none;
+	}
+	
+	.faces{
+		width: 100%;
+	}
+
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<p class="lead">{{ user_profile.user.first_name}}, thanks for slowing down!</p>
+
+
+
+<div class="settings">
+
+{% if user_profile.twitters.all|length > 0 %}
+	<p>
+	<strong>Your digest will contain tweets from: </strong>
+	{% for t in user_profile.twitters.all %}
+		{% if forloop.last %}
+		<a href="http://twitter.com/{{ t }}" target="_blank">{{ t }}</a>
+		{% else %}
+		<a href="http://twitter.com/{{ t }}" target="_blank">{{ t }}</a>, 
+		{% endif %}
+	{% endfor %}
+	<div class="faces">
+	{% for p in session.twitter_faces %}
+	<a href="http://twitter.com/{{ p.0 }}" target="_blank" title="{{ p.0 }}"><img class="profilepic" src="{{ p.1 }}" alt="{{ p.0 }}" /></a>
+	{% endfor %}
+	</div>
+	</p>
+{% endif %}
+
+{% if user_profile.instagrams.all|length > 0 %}
+	<p>
+	{% if user_profile.twitters.all|length == 0 %}
+	<strong>Your digest will contain photos from: </strong>
+	{% else %}
+	<strong>And photos from: </strong>
+	{% endif %}
+	
+	{% for i in user_profile.instagrams.all %}
+		{% if forloop.last %}
+		<a href="http://instagram.com/{{ i }}" target="_blank">{{ i }}</a> 
+		{% else %}
+		<a href="http://instagram.com/{{ i }}" target="_blank">{{ i }}</a>,  
+		{% endif %}
+	{% endfor %}
+	<div class="faces">
+	{% for p in session.insta_faces %}
+	<a href="http://instagram.com/{{ p.0 }}" target="_blank" title="{{ p.0 }}"><img class="profilepic" src="{{ p.1 }}" alt="{{ p.0 }}"/></a>
+	{% endfor %}
+	</div>
+	</p>
+{% endif %}
+
+<p>
+<strong>You'll receive your next digest: </strong>
+{% if user_profile.surprise_day and user_profile.surprise_time %}
+on some day this week at some time
+{% elif user_profile.surprise_day and not user_profile.surprise_time %}
+on some day this week at {{ local_time|date:'P' }}
+{% elif not user_profile.surprise_day and user_profile.surprise_time %}
+on {{ local_time.date}} at some time
+{% else %}
+on {{ local_time.date }} at {{ local_time|date:'P' }}
+{% endif %}
+</p>
+
+
+<p>
+<strong>It will be sent to: </strong>
+<a href="mailto:{{ user_profile.user.email }}">{{ user_profile.user.email }}</a>
+</p>
+
+</div>
+
+<p class="editsettings"><a class="btn btn-primary" href="/edit-settings/">Edit Digest Settings</a></p>
+
+<p class="logout"><a href="/logout/">Sign Out</a></p>
+
+{% endblock %}

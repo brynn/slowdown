@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load tz %}
+
+{% block head_scripts %}
+
+{% endblock %}
+
+{% block content %}
+
+<p class="intro"><strong>Select up to 10 friends from Twitter and Instagram whose posts you don't want to miss.</strong> Each digest will transform these posts in <a href="/examples" target="_blank">ways you might not expect</a>. But don't stress out! You'll be able to edit your list of friends whenever you want.</p>
+
+<form role="form" id="signup" action="/done/" method="post">
+ {% csrf_token %} 
+
+<div class="form-group">
+  	{% if not twitter_connected %}
+  	<a class="btn btn-info" href="{% url 'social:begin' 'twitter' %}">Connect Your Twitter Account</a>
+  	{% endif %}
+  	{% if not instagram_connected %}
+  	<a class="btn btn-info" href="{% url 'social:begin' 'instagram' %}">Connect Your Instagram Account</a>
+  	{% endif %}
+  </div>
+
+{% if twitter_connected %}
+ {% if session.errors.twitter %}
+  <div class="form-group has-error">
+  	<label class="control-label" for="inputError1">Please select at least one Twitter user.</label>
+  	<input type="text" class="typeahead form-control" id="twitters" name="twitters" placeholder="Type a username, without the @ symbol" value="">
+  </div>
+  {% else %}
+  <div class="form-group">
+    <label for="twitters">Whose tweets do you want to read?</label> <small class="float-right"><a href="https://twitter.com/following" target="_blank">See the people you follow</a></small>
+    <input type="text" class="typeahead form-control" id="twitters" name="twitters" placeholder="Type a username, without the @ symbol" value="">
+  </div>
+   {% endif %}
+  <div class="checkbox">
+	  <label>
+	    {% if my_tweets %}
+	    <input type="checkbox" name="checkbox-twitter" id="checkbox-twitter" checked/>
+	    {% else %}
+	    <input type="checkbox" name="checkbox-twitter" id="checkbox-twitter"/>
+	    {% endif %}
+	    Include my own tweets
+	  </label>
+	  <small class="float-right num-remaining">
+	  	<span class="num">10</span>
+	  	<span class="p">people</span> left
+	  </small>
+  </div>  
+  <a class="btn btn-default" id="twitter_pickforme" href="#">Choose 10 For Me</a> 
+ {% endif %} 
+ 
+ 
+   
+  {% if instagram_connected %}
+	  {% if session.errors.instagram %}
+	  <div class="form-group has-error">
+	  	<label class="control-label" for="inputError1">Please select at least one Instagram user.</label>
+	  	<input type="text" class="typeahead form-control" id="instagrams" name="instagrams" placeholder="Type a username" value="">
+	  </div>
+	  {% else %}
+	  <div class="form-group">
+	    <label for="instagrams">Whose Instagram photos do you want to see?</label><small class="float-right"><a href="http://iconosquare.com/viewer.php/myFollowings" target="_blank">See the people you follow</a></small>  
+        <input type="text" class="typeahead form-control" id="instagrams" name="instagrams" placeholder="Type a username" value=""> 
+	  </div>
+	  {% endif %}
+	  <div class="checkbox">
+		  <label>
+		    <input type="checkbox" name="checkbox-instagram" id="checkbox-instagram"/>
+		    Include my own photos
+		  </label>
+		  <small class="float-right num-remaining">
+		  	<span class="num">10</span>
+		  	<span class="p">people</span> left
+		  </small>
+	  </div>
+	  <a class="btn btn-default" id="instagram_pickforme" href="#">Choose 10 For Me</a> 
+  {% endif %}
+
+<input name="my-tweets" type="hidden" value="-1" />
+<input name="my-photos" type="hidden" value="-1" />
+
+
+  <div class="form-group">
+    <p><strong>How often do you want to receive the digest?</strong></p>	
+  	<div class="btn-group" data-toggle="buttons">
+	    <label id="weekly" class="btn btn-default btn-frequency active">
+	      <input type="radio" value=1> Weekly
+	    </label>
+
+	    <label id="daily" class="btn btn-default btn-frequency">
+	      <input type="radio" value=2> Daily
+	    </label>
+	</div>
+  </div>
+
+  <input name="frequency" type="hidden" value="1" />
+
+  
+  <div id="day-of-week">
+
+
+
+  <div class="form-group">
+    <p><strong>On which day of the week?</strong></p>
+    	<select name="day-of-week" class="form-control">
+		  <option selected value=0>Monday</option>
+		  <option value=1>Tuesday</option>
+		  <option value=2>Wednesday</option>
+		  <option value=3>Thursday</option>
+		  <option value=4>Friday</option>
+		  <option value=5>Saturday</option>
+		  <option value=6>Sunday</option>
+  	  </select>
+  	  
+	  	<div class="checkbox">
+		  <label>
+		    <input type="checkbox" name="checkbox-day-of-week" id="checkbox-day-of-week"/>
+		    Surprise me
+		  </label>
+		</div>  
+  	</div>
+  </div>
+
+  
+ 
+	<input type="hidden" name="time-setting" value="9:00 AM"/>
+    <div class="form-group">
+      <p><strong>At what time of the day?</strong></p>
+		<div class="input-append bootstrap-timepicker">
+            <input id="timepicker" name="time-of-day" type="text" class="input-small">
+            <span class="add-on"><i class="icon-time"></i></span>
+        </div>
+        <div class="checkbox">
+		  <label>
+		    <input type="checkbox" name="checkbox-time-of-day" id="checkbox-time-of-day"/>
+		    Surprise me
+		  </label>
+		</div>  
+    </div>
+
+
+  <input name="surprise-day" type="hidden" value="-1" />
+  <input name="surprise-time" type="hidden" value="-1" />
+  
+<!--
+  <div class="form-group">
+  	<p>In order to include the <a href="/examples/" target="_blank">Digital Voyeurism</a> section, Slow Down needs to detect your computer or phone's location.</p>
+  	<a class="btn btn-default" id="geolocation" href="#">Detect My Location</a> 
+  </div>
+ 
+-->
+
+
+  {% if session.errors.email %}
+  <div class="form-group has-error">
+  	<label class="control-label" for="inputError1">Please enter an email address.</label>  
+    <input type="text" class="form-control" id="email" name="email" placeholder="Type your email address" value=''>
+  </div>
+  {% else %}
+   <div class="form-group">
+  	 <label for="email">What's your email address?</label>
+    <input type="text" class="form-control" id="email" name="email" placeholder="Type your email address" value=''>
+  </div>
+  {% endif %}
+ 
+ 
+  
+   <input type="hidden" name="lat" value='0' />
+   <input type="hidden" name="lon" value='0' />
+   <input type="hidden" name="tz-offset" value='0' />
+  
+  <div class="form-group">
+  <button type="submit" class="btn btn-lg btn-primary">Sign Up</button>
+  </div>
+  <p class="lead">You'll receive your first digest on <span class="dow">Monday</span> at <span class="tod">9:00 AM</span>.<br /> Wait for it!</p>
+  
+</form>
+
+
+<div id="twitter_usernames_string" class="hidden">
+{% for friend in session.twitter_list %}
+{{ friend }}, 
+{% endfor %}
+</div>
+
+<div id="instagram_usernames_string" class="hidden">
+{% for friend in session.instagram_list %}
+{{ friend }}, 
+{% endfor %}
+</div>
+
+<div id="twitter_usernames_pickforme" class="hidden">
+{{ session.t_pickforme }}
+</div>
+
+<div id="instagram_usernames_pickforme" class="hidden">
+{{ session.i_pickforme }}
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script type=text/javascript>
+
+
+
+		
+$(document).ready(function() {
+
+
+/*
+$('#geolocation').click(
+	function() {
+		geolocate();
+		return false;
+});
+*/
+
+geolocate();
+
+detectTimezone();
+
+var twitter_usernames_string = $('#twitter_usernames_string').html();
+var twitter_usernames = twitter_usernames_string.split(',');
+
+var instagram_usernames_string = $('#instagram_usernames_string').html();
+var instagram_usernames = instagram_usernames_string.split(',');
+
+
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+ 
+    // an array that will be populated with substring matches
+    matches = [];
+ 
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+ 
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str });
+      }
+    });
+ 
+    cb(matches);
+  };
+};
+
+
+$('#twitters').tokenfield({
+  limit: 10,
+  typeahead: {
+    source: substringMatcher(twitter_usernames),
+    hint: true,
+  	highlight: true,
+  }
+});
+
+$('#instagrams').tokenfield({
+  limit: 10,
+  typeahead: {
+    source: substringMatcher(instagram_usernames),
+    hint: true,
+  	highlight: true,
+  }
+});
+
+
+
+ $('#timepicker').timepicker({ minuteStep: 60, defaultTime: '9:00 AM' });
+ 
+ var time_setting = $( 'input[name="time-setting"]' ).val();
+ if(time_setting == 0) {
+ 	time_setting = '12:00 AM';
+ } else if (time_setting == 12) {
+ 	time_setting = '12:00 PM';
+ } else if(time_setting > 12) {
+ 	time_setting -= 12;
+ 	time_setting += ':00 PM';
+ }  else {
+ 	time_setting += ':00 AM';
+ }
+ $('#timepicker').timepicker('setTime', time_setting);
+ 
+
+
+  
+
+
+
+});
+
+</script>
+
+{% endblock %}

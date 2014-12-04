@@ -756,8 +756,7 @@ def email_helper(user):
 	
 	subject = user.first_name + ', It\'s Time to Slow Down!'
 	
-	# TODO: remove the BCC!
-	msg = EmailMessage(subject, html_content, 'Slow Down Digest<no-reply+'+email_hash+'@slowdown.io>', [user.email], ['schmeenarf@gmail.com'])
+	msg = EmailMessage(subject, html_content, 'Slow Down Digest<no-reply+'+email_hash+'@slowdown.io>', [user.email])
 	msg.content_subtype = "html"
 	
 	# attach twitter mp3 if it exists and has content
@@ -903,8 +902,8 @@ def edit_settings(request):
 	 'session' : request.session,
 	 't_selected' : str(t_selected),
 	 'i_selected' : str(i_selected),
-	 'num_twitters_left' : 11 - len(user_profile.twitters.all()),
-	 'num_instagrams_left' : 11 - len(user_profile.instagrams.all()),
+	 'num_twitters_left' : 11 - len(t_selected.split(',')),
+	 'num_instagrams_left' : 11 - len(i_selected.split(',')),
 	 'my_tweets' : my_tweets,
 	 'my_photos' : my_photos,
 	 'day_of_week' : day_of_week,

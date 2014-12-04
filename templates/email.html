@@ -1,0 +1,219 @@
+{% load url from future %}
+{% load static %}
+{% load custom_filters %} 
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<table width="650" style="border-spacing: 0;">
+
+<tr>
+<td style="width: 25%;">
+<img src="http://slowdown.io/static/img/logo_notext.gif" style="width: 169px;" />
+</td>
+<td valign="middle" style="width: 75%; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 20px; font-weight: bold; color: #333;">
+<p style="width: 270px; margin-top: 60px;"><a href="http://slowdown.io" target="_blank" style="color: #333; text-decoration: none;">An <span style="color: #999;">Anti</span> Social Media Digest for the Digitally Stressed</a></p>
+</td>
+</tr>
+
+<tr>
+<td colspan="2" style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 18px; line-height: 27px; padding-bottom: 10px;" >
+<p style="width: 500px;">Hi, {{ user_profile.user.first_name }}! 
+Get excited, because it's time for
+{% if user_profile.frequency == 1 %}
+this week's
+{% else %}
+today's 
+{% endif %}
+Slow Down digest. Enjoy! And don't forget, you can always <a href="http://slowdown.io/edit-settings" style="color: #27bddd; text-decoration: none;"  target="_blank">change your settings</a> or <a href="http://slowdown.io/unsubscribe" style="color: #27bddd; text-decoration: none;" target="_blank">unsubscribe</a> from Slow Down.
+</p>
+
+</td>
+</tr>
+
+{% if not mashups and haikus|length == 0 and random_photos|length == 0 %}
+<tr>
+<td colspan="2" style="border-top: 2px solid #aaa; background-color: #f9f9f9; padding: 20px 20px 30px 20px;">
+	<p style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 18px; line-height: 27px; font-style: italic;">Alas! Your friends haven't posted anything new since 
+	{% if user_profile.frequency == 1 %}
+	last week. 
+	{% else %}
+	yesterday. 
+	{% endif %}
+	Try adding more people to your digest, switching your digest to weekly, or telling your friends to tweet more.
+	</p>
+
+</td>
+</tr>
+
+{% else %}
+
+	{% if user_profile.remixing and mashups %}
+	<tr>
+	<td colspan="2" style="border-top: 2px solid #aaa; background-color: #f9f9f9; padding: 0 20px 30px 20px;">
+		<h2 style="margin: 30px 0 0 0; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 28px;">Remixing the Stream</h2>
+		<p style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 14px; line-height: 21px; font-style: italic;">Mashups of your friends' Instagram photos with different friends' tweets.</p>
+		
+		<table width="650" style="font-family:'Helvetica Neue',helvetica,sans-serif">
+		<tr>
+		{% for mashup in mashups %}
+		<td valign="top" width="190">
+		<a href="http://slowdown.io/i/{{ mashup_links|hash:mashup.1 }}" target="_blank"><img style="width: 190px;" src="{{ mashup.1 }}" /></a>
+		<p style="width: 190px; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 13px; line-height: 19px;"><a style="text-decoration: none; color: #333;" href="http://slowdown.io/i/{{ mashup_links|hash:mashup.1 }}" target="_blank">{{ mashup.0.text }}</a><br /><a href="http://slowdown.io/i/{{ mashup_links|hash:mashup.1 }}" style="color: #27bddd; font-weight: bold; text-decoration: none; font-size: 15px; line-height: 30px;">Share</a></p>
+		</td>
+		{% if forloop.last %}
+			{% if mashups|length < 3 %}
+				<td width="190"></td>
+			{% endif %}
+			{% if mashups|length < 2 %}
+				<td width="190"></td>
+			{% endif %}
+		</tr>
+		{% else %}
+			{% if forloop.counter|divisibleby:"3" %}
+			</tr><tr>
+			{% endif %}
+		
+		{% endif %}
+		{% endfor %}
+		</table>
+	</td>
+	</tr>
+	{% endif %}
+	
+	{% if user_profile.zen and haikus|length > 0 %}
+	<tr>
+	<td colspan="2" style="border-top: 1px solid #ccc; background-color: #f9f9f9; padding: 0 20px 30px 20px;">
+		<h2 style="margin: 30px 0 0 0; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 28px;">Zen Twitter</h2>
+		<p style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 14px; line-height: 21px; font-style: italic;">Haikus, randomly generated from your friends' tweets.</p>
+		
+		<table width="650" style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 16px; line-height: 24px; border-spacing: 0;">
+		{% autoescape off %}
+		{% for h in haikus %}
+		<tr>
+		<td style="color: #333; border-top: 1px solid #ddd;">
+			{{ h|linebreaks }}<a href="http://slowdown.io/i/{{ haiku_links|hash:h }}" style="color: #27bddd; font-weight: bold; text-decoration: none; font-size: 15px; line-height: 15px;">Share</a>
+		
+		</td>
+		</tr>
+		{% endfor %}
+		{% endautoescape %}
+		</table>
+	</td>
+	</tr>
+	{% endif %}
+	
+	{% if user_profile.podcasts %}
+	<tr>
+	<td colspan="2" style="border-top: 1px solid #ccc; background-color: #f9f9f9; padding: 0 20px;">
+		<h2 style="margin: 30px 0 0 0; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 28px;">Social Podcasts</h2>
+		<p style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 14px; line-height: 21px; font-style: italic;">Listen to the stream. Audio files are also attached to the <a style="color: #27bddd; text-decoration: none;" href="#bottom">bottom of this email</a>.</p>
+		<p style="font-family:'Helvetica Neue',helvetica,sans-serif; margin-bottom: 30px;">
+			<a href="http://slowdown.io/i/{{ audio_links.twitter }}" style="color: #27bddd; font-weight: bold; text-decoration: none; font-size: 15px; line-height: 30px;">Share Twitter Podcast</a>
+			{% if instagrams.items|length > 0 %}
+			 · <a href="http://slowdown.io/i/{{ audio_links.instagram }}" style="color: #27bddd; font-weight: bold; text-decoration: none; font-size: 15px; line-height: 30px;">Share Instagram Podcast</a>
+			{% endif %}
+		</p>
+	</td>
+	</tr>
+	{% endif %}
+	
+	{% if user_profile.voyeurism and random_photos|length > 0 %}
+	<tr>
+	<td colspan="2" style="border-top: 1px solid #ccc; background-color: #f9f9f9; padding: 0 20px 30px 20px;">
+		<h2 style="margin: 30px 0 0 0; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 28px;">Digital Voyeurism</h2>
+		<p style="font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 14px; line-height: 21px; font-style: italic;">A random selection of public Instagram photos, taken near wherever you were when you signed up for Slow Down. </p>
+		<table width="650" style="list-style: none; padding: 0; font-family:'Helvetica Neue',helvetica,sans-serif">
+		<tr>
+			{% for p in random_photos %}
+			<td valign="top">
+				<a href="{{ p.1 }}" target="_blank"><img style="width: 200px;" src="{{ p.0 }}" /></a>
+			</td>
+			{% if forloop.last %}
+			</tr>
+			{% else %}
+				{% if forloop.counter|divisibleby:"3" %}
+				</tr><tr>
+				{% endif %}
+			
+			{% endif %}
+			{% endfor %}
+		
+		</table>
+	
+	
+	</td>
+	</tr>
+	{% endif %}
+	
+	{% if user_profile.appendix_t and tweets.items|length > 0 %}
+		{% for username, tweet_list in tweets.items %}
+		{% if tweet_list|length > 0 %}
+			{% if forloop.first %}
+			<tr>
+			<td colspan="2" style="border-top: 2px dashed #999; background-color: #eee; padding: 0 20px 30px 20px;">
+				<h2 style="margin: 30px 0 0 0; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 28px;">Appendix: Twitter</h2>
+			{% endif %}
+			<h3> <a style="text-decoration: none; color: #27bddd;" href="http://www.twitter.com/{{ username }}" target="_blank">@{{ username }}</a> </h3>
+			<ul class="tweets" style="list-style: none; padding: 0; font-family:'Helvetica Neue',helvetica,sans-serif">
+				{% for t in tweet_list %}
+				<li style="margin: 10px 0;"><a style="color: #333; text-decoration: none; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 14px; line-height: 20px; " href="http://www.twitter.com/{{ username }}/status/{{ t.id_str }}" target="_blank">{{ t.text }}</a></li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+		{% endfor %}
+	</td>
+	</tr>
+	{% endif %}
+	
+	
+	
+	{% if user_profile.appendix_i and instagrams.items|length > 0 %}
+		{% for username, photo_list in instagrams.items %}
+		{% if photo_list|length > 0 %}
+			{% if forloop.first %}
+			<tr>
+			<td colspan="2" style="border-top: 1px dashed #ccc; background-color: #eee; padding: 0 20px 30px 20px;">
+				<h2 style="margin: 30px 0 0 0; font-family:'Helvetica Neue',helvetica,sans-serif; font-size: 28px;">Appendix: Instagram</h2>
+			
+			{% endif %}
+		
+			<h3> <a style="text-decoration: none; color: #27bddd;" href="http://www.instagram.com/{{ username }}" target="_blank">@{{ username }}</a> </h3>
+			<table width="650" style="list-style: none; padding: 0; font-family:'Helvetica Neue',helvetica,sans-serif">
+			<tr>
+				{% for p in photo_list %}
+				<td valign="top" width="200">
+					<a href="{{ instagram_links|hash:p }}" target="_blank"><img style="width: 200px;" src="{{ p }}" /></a>
+				</td>	
+				{% if forloop.last %}
+					{% if photo_list|length < 3 %}
+						<td width="200"></td>
+					{% endif %}
+					{% if photo_list|length < 2 %}
+						<td width="200"></td>
+					{% endif %}
+				</tr>
+				{% else %}
+					{% if photo_list|length > 2 and forloop.counter|divisibleby:"3" %}
+					</tr><tr>
+					{% endif %}
+				
+				{% endif %}
+				{% endfor %}
+			</table>
+		{% endif %}
+		
+		
+		{% endfor %}
+		
+	</td>
+	</tr>
+	{% endif %}
+
+{% endif %}
+
+</table>
+<a name="bottom">&nbsp;</div>
+
+</html>

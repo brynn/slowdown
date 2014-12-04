@@ -1,0 +1,2 @@
+@hourly /usr/local/bin/python2.7 /home/bshepherd/webapps/slowdown_django/slowdown/scripts/send_digest.py
+

@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block head_scripts %}
+
+<style type=text/css>
+.bx-wrapper {
+	margin: 30px 0 50px 0;
+	text-align: center;
+}
+
+.bx-wrapper .bx-viewport {
+	background-color: #f9f9f9;
+	border: 0;
+	-moz-box-shadow: none;
+	-webkit-box-shadow:none;
+	box-shadow: none;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+
+
+ul.bxslider  {
+	margin: 30px 0;
+}
+
+.bxslider li {
+	height: 510px;
+}
+
+.bx-wrapper .bx-next {
+	right: 20px;
+}
+
+p {
+	font-size: 16px;
+	line-height: 24px;
+}
+
+p.desc {
+	font-style: italic;
+	color: #777;
+	width: 300px;
+	margin: 0 auto 20px auto;
+}
+
+h2 {
+	margin: 0 0 10px 0;
+}
+
+.mashup { 
+	position: relative; 
+	margin: 0 auto;
+	width: 320px;
+	height: 320px;
+	
+}
+.mashup p { 
+	position: absolute;
+	bottom: 0px; background: #000; 
+	opacity: 0.8; 
+	color: #fff; 
+	margin: 0;
+	padding: 10px 20px;
+	font-size: 14px;
+	line-height: 21px;
+
+}
+
+.mashup a { color: #fff; }
+
+.haiku {
+	margin-top: 20px;
+}
+
+audio {
+	margin-top: 20px;
+}
+
+.voyeurism {
+	width: 320px;
+	margin: 0 auto;
+}
+.voyeurism img {
+	width: 150px;
+	margin: 0 10px 10px 0;
+	float: left;
+}
+</style>
+
+
+
+
+{% endblock %}
+
+{% block content %}
+
+{% csrf_token %}
+
+<div class="examples">
+<p>Every Slow Down digest contains four sections. You can choose which ones you want to include in your email, and you'll also receive an appendix containing the original tweets and photos from everyone you’ve subscribed to using Slow Down.</p>
+
+<ul class="bxslider">
+  <li>
+  
+ 	<h2>Remixing the Stream</h2>
+
+  	<p class="desc">Mashups of your friends' Instagram photos with different friends' tweets.</p>
+		<div class="mashup">
+			<a href="http://instagram.com/p/nDoqVgSRAd/" target="_blank"><img src="http://distilleryimage2.s3.amazonaws.com/e71d39bec96811e38d4f0002c99b9a0e_8.jpg"></a>
+			<p><a href="http://www.twitter.com/ftrain/status/459671415474892800" target="_blank">In its final form, the media will solely consist of photographs of the contents of people's handbags, artfully arranged.</a></p>
+		</div>
+		
+
+  <li>
+  	<h2>Zen Twitter</h2>
+  	<p class="desc">Haikus, randomly generated from your friends' tweets.</p>
+ 
+<p class="haiku">observer, you are<br>indistinguishable from<br>the people you are<sup><a href="http://twitter.com/embarlow/status/458378654683131905" target="_blank">1</a></sup> </p>
+<p class="haiku">everything you do<br>is in a nightmarish state<br>of total failure<sup><a href="http://twitter.com/ftrain/status/458798768545353728" target="_blank">1</a></sup> </p>
+<p class="haiku">we know who the real<br>winner is.<sup><a href="http://twitter.com/KarlTheFog/status/458780290509336576" target="_blank">1</a></sup> Wondering when<br>the wind will settle<sup><a href="http://twitter.com/KarlTheFog/status/458777055513948161" target="_blank">2</a></sup> </p>
+  </li>
+  <li>
+  	<h2>Social Podcasts</h2>
+  	<p class="desc">Audio transcriptions of your friends' tweets and Instagram captions.</p>
+  	<audio controls>
+	  <source src="/static/audio/tweets_ma3_RWlQ3ZY.mp3" type="audio/mpeg">
+	Your browser does not support the audio element.
+	</audio>
+	<audio controls="">
+	  <source src="/static/audio/instagramcaptions_g-jvUYF04et.mp3" type="audio/mpeg">
+	Your browser does not support the audio element.
+	</audio>
+  </li>
+  <li>
+  	<h2>Digital Voyeurism</h2>
+  	<p class="desc">A random selection of public Instagram photos, taken near wherever you were when you signed up for Slow Down.</p>
+  	<div class="voyeurism">
+  	<a href="http://instagram.com/p/nJBKGyj3Wd/" target="_blank"><img src="http://distilleryimage10.ak.instagram.com/8c817280cb0d11e3bab10002c992909a_8.jpg" /></a>
+  	<a href="http://instagram.com/p/nJGunmsF5A/" target="_blank"><img src="http://distilleryimage6.ak.instagram.com/58d14d78cb1411e3a22e0002c954a3d6_8.jpg" /></a>
+  	<a href="http://instagram.com/p/nJCUM_PYbZ/" target="_blank"><img src="http://distilleryimage8.ak.instagram.com/f4db753ccb0e11e38f290002c9b4ec48_8.jpg" /></a>
+  	<a href="http://instagram.com/p/nJBR2qD9rB/" target="_blank"><img src="http://photos-f.ak.instagram.com/hphotos-ak-ash/929064_436877979789093_273752079_n.jpg" /></a>
+  	</div>
+   </li>
+
+</ul>
+
+{% if not user.is_authenticated %}
+<div class="btn-group">
+	<a class="btn btn-lg btn-primary" href="{% url 'social:begin' 'twitter' %}">Sign in with Twitter</a>
+	<a class="btn btn-lg btn-primary" href="{% url 'social:begin' 'instagram' %}">Sign in with Instagram</a>
+</div>
+<p class="help-text"><em>If you have accounts for both, it doesn't matter which one you choose; you'll be able to connect to the other one while signing up.</em></p>
+{% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script type=text/javascript>
+$(document).ready(function(){
+ 	$('.bxslider').bxSlider({
+  		slideMargin: 10
+	});
+});
+
+</script>
+
+
+{% endblock %}
+
+

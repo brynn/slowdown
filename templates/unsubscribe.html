@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+{% csrf_token %}
+
+{% if not deleted %}
+<p>{{ user.first_name }}, are you sure you want to unsubscribe from Slow Down?</p>
+<form role="form" id="unsubscribe" action="/unsubscribe/" method="post">
+ {% csrf_token %} 
+ <button type="submit" class="btn btn-lg btn-primary">Confirm</button>
+ <a class="btn btn-lg btn-default" href="/done/">Never Mind</a>
+</form>
+
+{% else %}
+<p>You've successfully unsubscribed.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block head_scripts %}
+
+{% endblock %}

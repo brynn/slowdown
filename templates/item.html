@@ -1,0 +1,190 @@
+{% extends "base_item.html" %}
+{% load url from future %}
+{% load static %}
+{% load custom_filters %} 
+
+{% block head_scripts %}
+
+<style type="text/css">
+.container-fluid {
+	margin: 50px 0;
+}
+
+.permalink_item {
+	background: #fff;
+	-moz-box-shadow: 1px 1px 1px #ccc;
+	-webkit-box-shadow: 1px 1px 1px #ccc;
+	box-shadow: 1px 1px 1px #ccc;
+	padding: 30px 40px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	margin: 20px 0;
+	font-size: 22px;
+	line-height: 33px;
+}
+
+
+ h1 {
+	width: 250px;
+	padding: 170px 0 0 0;
+	font-size: 18px;
+	line-height: 27px;
+	height: auto;
+	margin-bottom: 20px;
+}
+
+
+
+.mashup { 
+	position: relative; 
+	margin: 10px 0;
+	
+}
+.mashup p { 
+	position: absolute;
+	bottom: 0px; background: #000; 
+	opacity: 0.8; 
+	color: #fff; 
+	margin: 0;
+	padding: 10px 20px;
+	font-size: 20px;
+	line-height: 30px;
+	width: 100%;
+}
+
+.mashup a { color: #fff; }
+
+
+@media (max-width: 784px) { 
+ h1 {
+	width: 100%;
+	padding: 70px 0 0 140px;
+	height: 160px;
+	margin-bottom: 20px;
+}
+
+h2 {
+	font-size: 26px;
+}
+
+
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<div class="container-fluid">
+
+<div class="row">
+
+<div class="col-sm-1 col-md-1"></div>
+
+<div class="col-sm-4 col-md-3">
+<h1 id="logo"><a href="/">An <em>Anti</em> Social Media Digest for the Digitally Stressed</a></h1>
+{% if not request.user.is_authenticated %}
+<a class="btn btn-primary" href="/">Sign Up for Slow Down</a>
+{% endif %}
+</div>
+
+
+
+<div class="col-sm-6 col-md-6">
+	{% if request.user.is_authenticated and request.user == item.user %}
+		{% if item.item_type == 'RM' %}
+		<h2>Share this Remix!</h2>
+		{% elif item.item_type == 'HU' %}
+		<h2>Share this Haiku!</h2>
+		{% else %}
+		<h2>Share this Social Podcast!</h2>
+		{% endif %}
+	
+	{% else %}
+		{% if item.item_type == 'RM' %}
+		<h2>A Remix from {{ item.user.first_name }}'s Digest </h2>
+		{% elif item.item_type == 'HU' %}
+		<h2>A Haiku from {{ item.user.first_name }}'s Digest </h2>
+		{% else %}
+		<h2>A Social Podcast from {{ item.user.first_name }}'s Digest </h2>
+		{% endif %}
+	
+	{% endif %}
+	
+	<div class="permalink_item">
+		{% if item.audio %}
+		<audio controls>
+		  <source src="{{ item.audio }}" type="audio/mpeg">
+		Your browser does not support the audio element.
+		</audio>
+		
+		{% else %}
+	
+			{% if item.image_url %}
+		
+			<div class="mashup">
+				<a href="{{ item.image_link }}" target="_blank"><img src="{{ item.image_url }}" /></a>
+				<p><a href="{{ item.text_link }}" target="_blank">{{ item.text }}</a></p>
+			</div>
+			
+			
+			{% else %}
+			
+			{% autoescape off %}
+			<p>{{ item.text|linebreaks }}</p>
+			{% endautoescape %}
+			
+			{% endif %}
+		
+		{% endif %}
+	</div>
+	
+	{% if request.user.is_authenticated and request.user == item.user %}
+	<div class="share-container clearfix">
+	<ul class="rrssb-buttons clearfix">
+	
+	    <li class="twitter">
+	        <a href="http://twitter.com/home?status=Straight%20from%20my%20@slowdowndigest!%20http://slowdown.io{{ request.get_full_path }}" class="popup">
+	            <span class="icon">
+	                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	                     width="28px" height="28px" viewBox="0 0 28 28" enable-background="new 0 0 28 28" xml:space="preserve">
+	                <path d="M24.253,8.756C24.689,17.08,18.297,24.182,9.97,24.62c-3.122,0.162-6.219-0.646-8.861-2.32
+	                    c2.703,0.179,5.376-0.648,7.508-2.321c-2.072-0.247-3.818-1.661-4.489-3.638c0.801,0.128,1.62,0.076,2.399-0.155
+	                    C4.045,15.72,2.215,13.6,2.115,11.077c0.688,0.275,1.426,0.407,2.168,0.386c-2.135-1.65-2.729-4.621-1.394-6.965
+	                    C5.575,7.816,9.54,9.84,13.803,10.071c-0.842-2.739,0.694-5.64,3.434-6.482c2.018-0.623,4.212,0.044,5.546,1.683
+	                    c1.186-0.213,2.318-0.662,3.329-1.317c-0.385,1.256-1.247,2.312-2.399,2.942c1.048-0.106,2.069-0.394,3.019-0.851
+	                    C26.275,7.229,25.39,8.196,24.253,8.756z"/>
+	                </svg>
+	           </span>
+	            <span class="text">twitter</span>
+	        </a>
+	    </li>
+	    <li class="facebook">    	
+	    	<a href="https://www.facebook.com/sharer/sharer.php?u=http://slowdown.io{{ request.get_full_path }}" class="popup">
+	    	<span class="icon">
+	            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="28px" height="28px" viewBox="0 0 28 28" enable-background="new 0 0 28 28" xml:space="preserve">
+	                <path d="M27.825,4.783c0-2.427-2.182-4.608-4.608-4.608H4.783c-2.422,0-4.608,2.182-4.608,4.608v18.434
+	                    c0,2.427,2.181,4.608,4.608,4.608H14V17.379h-3.379v-4.608H14v-1.795c0-3.089,2.335-5.885,5.192-5.885h3.718v4.608h-3.726
+	                    c-0.408,0-0.884,0.492-0.884,1.236v1.836h4.609v4.608h-4.609v10.446h4.916c2.422,0,4.608-2.188,4.608-4.608V4.783z"/>
+	            </svg>
+	        </span>
+	    	<span class="text">Facebook</span>
+	    	</a>
+	    </li>
+	
+	 </ul>
+	</div>
+	{% endif %}
+
+</div>
+
+<div class="col-sm-1 col-md-2"></div>
+
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load tz %}
+
+{% block head_scripts %}
+
+
+{% endblock %}
+
+{% block content %}
+
+<form role="form" id="signup" action="/done/" method="post">
+ {% csrf_token %} 
+
+<div class="form-group">
+  	{% if not twitter_connected %}
+  	<a class="btn btn-default" href="{% url 'social:begin' 'twitter' %}">Connect Your Twitter Account</a>
+  	{% endif %}
+  	{% if not instagram_connected %}
+  	<a class="btn btn-default" href="{% url 'social:begin' 'instagram' %}">Connect Your Instagram Account</a>
+  	{% endif %}
+  </div>
+
+{% if twitter_connected %}
+ {% if session.errors.twitter %}
+  <div class="form-group has-error">
+  	<label class="control-label" for="inputError1">Please select at least one Twitter user.</label>
+  	<input type="text" class="typeahead form-control" id="twitters" name="twitters" placeholder="Type a username" value="">
+  </div>
+  {% else %}
+  <div class="form-group">
+    <label for="twitters">Whose tweets do you want to read?</label> <small class="float-right"><a href="https://twitter.com/following" target="_blank">See the people you follow</a></small>
+    <input type="text" class="typeahead form-control" id="twitters" name="twitters" placeholder="Type a username" value="{{ t_selected }}">
+  </div>
+   {% endif %}
+  <div class="checkbox">
+	  <label>
+	    {% if my_tweets %}
+	    <input type="checkbox" name="checkbox-twitter" id="checkbox-twitter" checked/>
+	    {% else %}
+	    <input type="checkbox" name="checkbox-twitter" id="checkbox-twitter"/>
+	    {% endif %}
+	    Include my own tweets
+	  </label>
+	  <small class="float-right num-remaining">
+	  	<span class="num">{{ num_twitters_left }}</span>
+	  	{% if num_twitters_left == 1 %} 
+	  	<span class="p">person</span> left
+	  	{% else %}
+	  	<span class="p">people</span> left
+	  	{% endif %}
+	  </small>
+  </div> 
+  <a class="btn btn-default" id="twitter_pickforme" href="#">Choose 10 For Me</a> 
+{% endif %}  
+ 
+ 
+   
+  {% if instagram_connected %}
+	  {% if session.errors.instagram %}
+	  <div class="form-group has-error">
+	  	<label class="control-label" for="inputError1">Please select at least one Instagram user.</label>
+	  	<input type="text" class="typeahead form-control" id="instagrams" name="instagrams" placeholder="Type a username" value="">
+	  </div>
+	  {% else %}
+	  <div class="form-group">
+	    <label for="instagrams">Whose Instagram photos do you want to see?</label><small class="float-right"><a href="http://iconosquare.com/viewer.php/myFollowings" target="_blank">See the people you follow</a></small>  
+        <input type="text" class="typeahead form-control" id="instagrams" name="instagrams" placeholder="Type a username" value="{{ i_selected }}"> 
+	  </div>
+	  {% endif %}
+	  <div class="checkbox">
+		  <label>
+		    {% if my_photos %}
+		    <input type="checkbox" name="checkbox-instagram" id="checkbox-instagram" checked/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-instagram" id="checkbox-instagram"/>
+		    {% endif %}
+		    Include my own photos
+		  </label>
+		  <small class="float-right num-remaining">
+		  	<span class="num">{{ num_instagrams_left }}</span>
+		  	{% if num_instagrams_left == 1 %} 
+		  	<span class="p">person</span> left
+		  	{% else %}
+		  	<span class="p">people</span> left
+		  	{% endif %}
+		  </small>
+	  </div>
+	  <a class="btn btn-default" id="instagram_pickforme" href="#">Choose 10 For Me</a> 
+  {% endif %}
+
+<input name="my-tweets" type="hidden" value="{{ my_tweets|yesno:'1, -1' }} " />
+<input name="my-photos" type="hidden" value="{{ my_photos|yesno:'1, -1'}} " />
+
+
+  <div class="form-group">
+    <p><strong>How often do you want to receive the digest?</strong></p>	
+  	<div class="btn-group" data-toggle="buttons">
+	  	{% if user_profile.frequency == 1 or not user_profile.frequency %}
+	    <label id="weekly" class="btn btn-default btn-frequency active">
+	    {% else %}
+	    <label id="weekly" class="btn btn-default btn-frequency">
+	    {% endif %}
+	      <input type="radio" value=1> Weekly
+	    </label>
+	    {% if user_profile.frequency == 2 %}
+	    <label id="daily" class="btn btn-default btn-frequency active">
+	    {% else %}
+	    <label id="daily" class="btn btn-default btn-frequency">
+	    {% endif %}
+	      <input type="radio" value=2> Daily
+	    </label>
+	</div>
+  </div>
+  {% if user_profile.frequency %}
+  <input name="frequency" type="hidden" value="{{ user_profile.frequency }}" />
+  {% else %}
+  <input name="frequency" type="hidden" value="1" />
+  {% endif %}
+  
+  {% if user_profile.frequency == 1 or not user_profile.frequency %}
+  <div id="day-of-week">
+  {% else %}
+  <div id="day-of-week" class="hide-this">
+  {% endif %}
+
+
+  <div class="form-group">
+    <p><strong>On which day of the week?</strong></p>
+  	  {% if user_profile.surprise_day %}
+	  <select name="day-of-week" class="form-control" disabled>
+	  {% else %}
+	  <select name="day-of-week" class="form-control">
+	  {% endif %}
+	  	  {% if day_of_week == 0 %}
+		  <option selected value=0>Monday</option>
+		  {% else %}
+		  <option value=0>Monday</option>
+		  {% endif %}
+		  {% if day_of_week == 1 %}
+		  <option selected value=1>Tuesday</option>
+		  {% else %}
+		  <option value=1>Tuesday</option>
+		  {% endif %}
+		  {% if day_of_week == 2 %}
+		  <option selected value=2>Wednesday</option>
+		  {% else %}
+		  <option value=2>Wednesday</option>
+		  {% endif %}
+		  {% if day_of_week == 3 %}
+		  <option selected value=3>Thursday</option>
+		  {% else %}
+		  <option value=3>Thursday</option>
+		  {% endif %}
+		  {% if day_of_week == 4 %}
+		  <option selected value=4>Friday</option>
+		  {% else %}
+		  <option value=4>Friday</option>
+		  {% endif %}
+		  {% if day_of_week == 5 %}
+		  <option selected value=5>Saturday</option>
+		  {% else %}
+		  <option value=5>Saturday</option>
+		  {% endif %}
+		  {% if day_of_week == 6 %}
+		  <option selected value=6>Sunday</option>
+		  {% else %}
+		  <option value=6>Sunday</option>
+		  {% endif %}
+  	  </select>
+  	  
+	  	<div class="checkbox">
+		  <label>
+		  	{% if user_profile.surprise_day %}
+		    <input checked type="checkbox" name="checkbox-day-of-week" id="checkbox-day-of-week"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-day-of-week" id="checkbox-day-of-week"/>
+		    {% endif %}
+		    Surprise me
+		  </label>
+		</div>  
+  	</div>
+  </div>
+
+  
+ 
+	<input type="hidden" name="time-setting" value={{ time_of_day }} />
+    <div class="form-group">
+      <p><strong>At what time of the day?</strong></p>
+		<div class="input-append bootstrap-timepicker">
+			{% if user_profile.surprise_time %}
+            <input id="timepicker" name="time-of-day" type="text" class="input-small" disabled>
+            {% else %}
+            <input id="timepicker" name="time-of-day" type="text" class="input-small">
+            {% endif %}
+            
+            <span class="add-on"><i class="icon-time"></i></span>
+        </div>
+        <div class="checkbox">
+		  <label>
+		  	{% if user_profile.surprise_time %}
+		    <input checked type="checkbox" name="checkbox-time-of-day" id="checkbox-time-of-day"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-time-of-day" id="checkbox-time-of-day"/>
+		    {% endif %}
+		    Surprise me
+		  </label>
+		</div>  
+    </div>
+
+
+  <input name="surprise-day" type="hidden" value="{{ user_profile.surprise_day|yesno:'1, -1' }}" />
+  <input name="surprise-time" type="hidden" value="{{ user_profile.surprise_time|yesno:'1, -1' }}" />
+  
+ 
+  <div class="form-group">
+   <p><strong>Which sections do you want to include in your digest?</strong></p>
+	  <div class="checkbox">
+		  <label>
+		  	{% if user_profile.remixing %}
+		    <input checked type="checkbox" name="checkbox-remixing" id="checkbox-remixing"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-remixing" id="checkbox-remixing"/>
+		    {% endif %}
+		    Remixing the Stream
+		  </label>
+	  </div> 
+	  <div class="checkbox">
+		  <label>
+		  	{% if user_profile.zen %}
+		    <input checked type="checkbox" name="checkbox-zen" id="checkbox-zen"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-zen" id="checkbox-zen"/>
+		    {% endif %}
+		    Zen Twitter
+		  </label>
+	  </div> 
+	  <div class="checkbox">
+		  <label>
+		  	{% if user_profile.podcasts %}
+		    <input checked type="checkbox" name="checkbox-podcasts" id="checkbox-podcasts"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-podcasts" id="checkbox-podcasts"/>
+		    {% endif %}
+		    Social Podcasts
+		  </label>
+	  </div> 
+	  <div class="checkbox">
+		  <label>
+		  	{% if user_profile.voyeurism %}
+		    <input checked type="checkbox" name="checkbox-voyeurism" id="checkbox-voyeurism"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-voyeurism" id="checkbox-voyeurism"/>
+		    {% endif %}
+		    Digital Voyeurism
+		  </label>
+	  </div>
+	  <div class="checkbox">
+		  <label>
+		  	{% if user_profile.appendix_t %}
+		    <input checked type="checkbox" name="checkbox-appendix-t" id="checkbox-appendix-t"/>
+		    {% else %}
+		    <input type="checkbox" name="checkbox-appendix-t" id="checkbox-appendix-t"/>
+		    {% endif %}
+		    Appendix: Twitter
+		  </label>
+	  </div>
+	  <div class="checkbox">
+		  <label>
+		  	{% if user_profile.appendix_i %}
+		    <input checked type="checkbox" name="checkbox-appendix-i" id="checkbox-appendix-i"/>
+			{% else %}
+		    <input type="checkbox" name="checkbox-appendix-i" id="checkbox-appendix-i"/>
+		    {% endif %}
+		    Appendix: Instagram
+		  </label>
+	  </div> 
+  </div> 
+ 
+  <input name="remixing" type="hidden" value="{{ user_profile.remixing|yesno:'1, -1' }}" />
+  <input name="zen" type="hidden" value="{{ user_profile.zen|yesno:'1, -1' }}" />
+  <input name="podcasts" type="hidden" value="{{ user_profile.podcasts|yesno:'1, -1' }}" />
+  <input name="voyeurism" type="hidden" value="{{ user_profile.voyeurism|yesno:'1, -1' }}" />
+  <input name="appendix-t" type="hidden" value="{{ user_profile.appendix_t|yesno:'1, -1' }}" />
+  <input name="appendix-i" type="hidden" value="{{ user_profile.appendix_i|yesno:'1, -1' }}" />
+     
+  {% if session.errors.email %}
+  <div class="form-group has-error">
+  	<label class="control-label" for="inputError1">Please enter an email address.</label>  
+    <input type="text" class="form-control" id="email" name="email" placeholder="Type your email address" value=''>
+  </div>
+  {% else %}
+   <div class="form-group">
+  	 <label for="email">What's your email address?</label>
+    <input type="text" class="form-control" id="email" name="email" placeholder="Type your email address" value={{ user_profile.user.email }}>
+  </div>
+  {% endif %}
+ 
+ 
+  
+   <input type="hidden" name="lat" value='0' />
+   <input type="hidden" name="lon" value='0' />
+   <input type="hidden" name="tz-offset" value='0' />
+  
+  <div class="form-group">
+  <button type="submit" class="btn btn-lg btn-primary">Save Settings</button>
+  <a class="btn btn-lg btn-default" href="/done/">Cancel</a>
+  </div>
+  
+</form>
+
+
+<div id="twitter_usernames_string" class="hidden">
+{% for friend in session.twitter_list %}
+{{ friend }}, 
+{% endfor %}
+</div>
+
+<div id="instagram_usernames_string" class="hidden">
+{% for friend in session.instagram_list %}
+{{ friend }}, 
+{% endfor %}
+</div>
+
+
+
+<div id="twitter_usernames_pickforme" class="hidden">
+{{ session.t_pickforme }}
+</div>
+
+<div id="instagram_usernames_pickforme" class="hidden">
+{{ session.i_pickforme }}
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
+<script type=text/javascript>
+
+
+
+		
+$(document).ready(function() {
+
+geolocate();
+detectTimezone();
+
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+ 
+    // an array that will be populated with substring matches
+    matches = [];
+ 
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+ 
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str });
+      }
+    });
+ 
+    cb(matches);
+  };
+};
+
+var twitter_usernames_string = $('#twitter_usernames_string').html();
+var twitter_usernames = twitter_usernames_string.split(',');
+
+var instagram_usernames_string = $('#instagram_usernames_string').html();
+var instagram_usernames = instagram_usernames_string.split(',');
+
+
+$('#twitters').tokenfield({
+  limit: 10,
+  typeahead: {
+    source: substringMatcher(twitter_usernames),
+    hint: true,
+  	highlight: true,
+  }
+});
+
+$('#instagrams').tokenfield({
+  limit: 10,
+  typeahead: {
+    source: substringMatcher(instagram_usernames),
+    hint: true,
+  	highlight: true,
+  }
+});
+
+
+
+ $('#timepicker').timepicker({ minuteStep: 60, defaultTime: '9:00 AM' });
+ 
+ var time_setting = $( 'input[name="time-setting"]' ).val();
+ if(time_setting == 0) {
+ 	time_setting = '12:00 AM';
+ } else if (time_setting == 12) {
+ 	time_setting = '12:00 PM';
+ } else if(time_setting > 12) {
+ 	time_setting -= 12;
+ 	time_setting += ':00 PM';
+ }  else {
+ 	time_setting += ':00 AM';
+ }
+ $('#timepicker').timepicker('setTime', time_setting);
+ 
+
+
+  
+
+
+
+});
+
+</script>
+
+{% endblock %}

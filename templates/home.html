@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+
+
+{% block content %}
+
+{% csrf_token %}
+
+<div class="home">
+	
+	<blockquote cite="http://www.theatlantic.com/technology/archive/2013/12/2013-the-year-the-stream-crested/282202/">
+	<p>“And now, who can keep up? There is a melancholy to the infinite scroll.”</p>
+	<footer><a href="http://www.theatlantic.com/technology/archive/2013/12/2013-the-year-the-stream-crested/282202/" target="_blank">Alexis Madrigal</a></footer>
+	</blockquote>
+	
+	<p>Who can keep up, indeed. These days, there is always more to read, or watch, or like, or share, or retweet, or bookmark on the web. We go to the bottom of the page, looking for the end of the infinitely scrolling stream, but we never get there. There are always more posts, more tabs, more notifications.  The stream rushes by us at an increasingly rapid pace and it has become harder and harder for us to stay afloat. </p>
+	
+	<p><strong><a href="/">Slow Down</a></strong> questions our existing, often unhealthy relationship with social media and digital content, and makes our digital “stuff” a little more meaningful and a little less stressful. Want to start using Slow Down? <a href="/examples/">See examples</a> of the digest in action, or sign in below.</p>
+	
+	<div class="btn-group">
+	<a class="btn btn-lg btn-primary" href="{% url 'social:begin' 'twitter' %}">Sign in with Twitter</a>
+	<a class="btn btn-lg btn-primary" href="{% url 'social:begin' 'instagram' %}">Sign in with Instagram</a>
+	</div>
+	<p class="help-text"><em>If you have accounts for both, it doesn't matter which you choose; you'll be able to connect to the other while signing up.</em></p>
+</div>
+
+{% endblock %}
+
+{% block head_scripts %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script src="https://login.persona.org/include.js" type="text/javascript"></script>
+
+
+
+{% endblock %}
